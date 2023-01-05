@@ -11,7 +11,11 @@ base64
 tensorflow
 opencv-python
 tqdm
-keras
 scikit-image
 requests
 requires.io
+gunicorn
+dash_bootstrap_components
+dash-renderer
+dash-html-components
+dash-core-components
