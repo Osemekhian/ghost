@@ -24,19 +24,18 @@ steps=0.1
 marks= lambda min,max:{i:f"{i}" for i in range(min,max)}
 #===========================================
 def datum():
-    dat = pd.read_csv(
+    return pd.read_csv(
         'https://docs.google.com/spreadsheets/d/e/2PACX-1vTiQBygf4Uo45gGW4qfdO5ekeyYSz6O9JP9SkBogtLSzlGrE5bMa0pJy2voQakRf_izgZwzU3WwVaA_/pub?gid=593030798&single=true&output=csv')
-    return dat
 
 my_app= dash.Dash(__name__,external_stylesheets=[dbc.themes.SOLAR]) #dbc.themes.MORPH
-server= my_app.server
+server = my_app.server
 my_app.layout = html.Div([
     html.H1('Denny"s DashBoard'),html.Br(),
     html.P('Store:'),
     dcc.Dropdown(id='drop1',
                  options=[{'label': i, 'value': i} for i in ['Benning Road','Bladensburg']],
                  multi=False,
-                 value=["Benning Road"],placeholder='Select Store...'), html.Br(),
+                 value="Benning Road",placeholder='Select Store...'), html.Br(),
     html.P('Date:'),
     dcc.DatePickerSingle(
         id='my-date-picker-single',
@@ -52,19 +51,22 @@ my_app.layout = html.Div([
     [Input('my-date-picker-single', 'date'),
      Input('drop1', 'value')])
 def update(a,b):
-    df = pd.read_csv(
-        'https://docs.google.com/spreadsheets/d/e/2PACX-1vTiQBygf4Uo45gGW4qfdO5ekeyYSz6O9JP9SkBogtLSzlGrE5bMa0pJy2voQakRf_izgZwzU3WwVaA_/pub?gid=593030798&single=true&output=csv')
+    df= datum()
+    # df = pd.read_csv(
+    #     'https://docs.google.com/spreadsheets/d/e/2PACX-1vTiQBygf4Uo45gGW4qfdO5ekeyYSz6O9JP9SkBogtLSzlGrE5bMa0pJy2voQakRf_izgZwzU3WwVaA_/pub?gid=593030798&single=true&output=csv')
     date_object = date.fromisoformat(a)
-    date_string = date_object.strftime('%m/%d/%Y')
+    date_string = date_object.strftime('%#m/%#d/%Y')
     filter = df[df.Date == date_string]
-    filter = df[df.Store == b]
+    filter = filter[filter.Store == b]
+    if len(filter)==0:
+        return html.P("No Feedback :( Try again!")
     imgs=[]
     for i in range(len(filter)):
         filter['Image (Dashboard)'].iloc[i] = filter['Image (Dashboard)'].iloc[i].replace('open?', 'uc?')+'&export=download'
     for i in range(len(filter)):
         imgs.append([io.imread(filter.iloc[:,-1].iloc[i])])
     idx=1
-    plt.figure(figsize=(20,20))
+    plt.figure(figsize=(15,15))
     for i in range(len(filter)):
         plt.subplot(2, 2, idx)
         plt.imshow(imgs[i][0])
