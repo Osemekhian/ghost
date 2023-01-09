@@ -74,7 +74,7 @@ def update(a,b):
         idx +=1
     buf = IO.BytesIO()  # in-memory files
     plt.savefig(buf, format="png")  # save to the above file object
-    plt.close()
+    #plt.close()
     data = base64.b64encode(buf.getbuffer()).decode("utf8")  # encode to html elements
     final = "data:image/png;base64,{}".format(data)
 
