@@ -52,7 +52,7 @@ my_app.layout = html.Div([
      Input('drop1', 'value'),
      Input('radio1','value')])
 def update(a,b,c):
-    df= datum()
+    df= pd.read_csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vTiQBygf4Uo45gGW4qfdO5ekeyYSz6O9JP9SkBogtLSzlGrE5bMa0pJy2voQakRf_izgZwzU3WwVaA_/pub?gid=593030798&single=true&output=csv')
     date_object = date.fromisoformat(a)
     date_string = date_object.strftime('%#m/%#d/%Y')
     filter = df[df.Date == date_string]
@@ -92,7 +92,9 @@ def update(a,b,c):
 
 if __name__ == '__main__':
     my_app.run_server(
-        debug=False
+        debug=True,
+        host='0.0.0.0',
+        port= 8080
     )
 
 
