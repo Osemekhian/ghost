@@ -100,9 +100,7 @@ def update(a,b,c):
 
 if __name__ == '__main__':
     my_app.run_server(
-        debug=False,
-        host='0.0.0.0',
-        port= 8080
+        debug=False
     )
 
 
