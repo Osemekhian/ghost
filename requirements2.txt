@@ -20,4 +20,3 @@ dash-html-components
 dash-core-components
 random2
 DateTime
-plotly --upgrade
