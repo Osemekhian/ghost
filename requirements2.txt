@@ -7,9 +7,6 @@ dash
 statsmodels
 scikit-learn
 pybase64
-tensorflow
-opencv-python
-tqdm
 scikit-image
 requests
 requires.io
