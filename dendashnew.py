@@ -53,8 +53,6 @@ my_app.layout = html.Div([
      Input('radio1','value')])
 def update(a,b,c):
     df= datum()
-    # df = pd.read_csv(
-    #     'https://docs.google.com/spreadsheets/d/e/2PACX-1vTiQBygf4Uo45gGW4qfdO5ekeyYSz6O9JP9SkBogtLSzlGrE5bMa0pJy2voQakRf_izgZwzU3WwVaA_/pub?gid=593030798&single=true&output=csv')
     date_object = date.fromisoformat(a)
     date_string = date_object.strftime('%#m/%#d/%Y')
     filter = df[df.Date == date_string]
@@ -75,10 +73,7 @@ def update(a,b,c):
                  title=f"{b} Employees")
 
     if c == "Seperate":
-        return html.Div([dcc.Graph(figure=fig),html.Br(),
-                         dcc.Graph(figure=fig2),html.Br(),
-                         dcc.Graph(figure=fig3), html.Br()
-                         ])
+        return html.Div([dcc.Graph(figure=fig), dcc.Graph(figure=fig2), dcc.Graph(figure=fig3)])
     else:
         fig_compare = px.bar(df,
                              x='Time',
@@ -93,10 +88,7 @@ def update(a,b,c):
                               y='All Employees', text_auto=True,color='Store',
                               title='Employees Between Stores')
 
-        return html.Div([dcc.Graph(figure=fig_compare),html.Br(),
-                         dcc.Graph(figure=fig_compare2),html.Br(),
-                         dcc.Graph(figure=fig_compare3), html.Br()
-                         ])
+        return html.Div([dcc.Graph(figure=fig_compare), dcc.Graph(figure=fig_compare2), dcc.Graph(figure=fig_compare3)])
 
 if __name__ == '__main__':
     my_app.run_server(
