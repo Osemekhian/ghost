@@ -5,7 +5,7 @@
 #pip install plotly --upgrade
 
 import dash as dash
-from dash import dcc, dash_table
+from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
