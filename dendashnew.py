@@ -79,6 +79,7 @@ def update(a,b,c):
     else:
         df= pd.read_csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vTiQBygf4Uo45gGW4qfdO5ekeyYSz6O9JP9SkBogtLSzlGrE5bMa0pJy2voQakRf_izgZwzU3WwVaA_/pub?gid=593030798&single=true&output=csv')
         df['Date'] = pd.to_datetime(df['Date'])
+        df = df[df.Date == a]
         fig_compare = px.bar(df,
                              x='Time',
                              y='Sales', text_auto=True,
