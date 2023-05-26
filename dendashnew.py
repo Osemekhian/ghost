@@ -56,19 +56,19 @@ def update(a,b,c):
 #     df= pd.read_csv('https://raw.githubusercontent.com/Osemekhian/ghost/main/data.csv')
     date_object = date.fromisoformat(a)
     date_string = date_object.strftime('%#m/%#d/%Y')
-    filter = df[df.Date == date_string]
-    filter = filter[filter.Store == b]
+    df = df[df.Date == date_string]
+    df = df[df.Store == b]
 #     if len(filter)==0:
 #         return html.P("No Feedback :( Try again!")
-    fig = px.bar(filter,
+    fig = px.bar(df,
                   x='Time',
                   y='Sales',text_auto=True,
                  title=f"{b} Sales")
-    fig2 = px.bar(filter,
+    fig2 = px.bar(df,
                   x='Time',
                   y=['Total Labor'],text_auto=True,
                   title=f"{b} Labor")
-    fig3 = px.bar(filter,
+    fig3 = px.bar(df,
                  x='Time',
                  y='All Employees', text_auto=True,
                  title=f"{b} Employees")
@@ -76,6 +76,7 @@ def update(a,b,c):
     if c == "Seperate":
         return html.Div([dcc.Graph(figure=fig), dcc.Graph(figure=fig2), dcc.Graph(figure=fig3)])
     else:
+        df= pd.read_csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vTiQBygf4Uo45gGW4qfdO5ekeyYSz6O9JP9SkBogtLSzlGrE5bMa0pJy2voQakRf_izgZwzU3WwVaA_/pub?gid=593030798&single=true&output=csv')
         fig_compare = px.bar(df,
                              x='Time',
                              y='Sales', text_auto=True,
