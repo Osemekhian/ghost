@@ -53,13 +53,14 @@ my_app.layout = html.Div([
      Input('radio1','value')])
 def update(a,b,c):
     df= pd.read_csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vTiQBygf4Uo45gGW4qfdO5ekeyYSz6O9JP9SkBogtLSzlGrE5bMa0pJy2voQakRf_izgZwzU3WwVaA_/pub?gid=593030798&single=true&output=csv')
+    df['Date'] = pd.to_datetime(df['Date'])
 #     df= pd.read_csv('https://raw.githubusercontent.com/Osemekhian/ghost/main/data.csv')
     date_object = date.fromisoformat(a)
     date_string = date_object.strftime('%#m/%#d/%Y')
-#     df = df[df.Date == date_string]
+    df = df[df.Date == a]
     df = df[df.Store == b]
-#     if len(filter)==0:
-#         return html.P("No Feedback :( Try again!")
+    if len(df)==0:
+        return html.P("No Feedback :( Try again!")
     fig = px.bar(df,
                   x='Time',
                   y='Sales',text_auto=True,
@@ -77,6 +78,7 @@ def update(a,b,c):
         return html.Div([dcc.Graph(figure=fig), dcc.Graph(figure=fig2), dcc.Graph(figure=fig3)])
     else:
         df= pd.read_csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vTiQBygf4Uo45gGW4qfdO5ekeyYSz6O9JP9SkBogtLSzlGrE5bMa0pJy2voQakRf_izgZwzU3WwVaA_/pub?gid=593030798&single=true&output=csv')
+        df['Date'] = pd.to_datetime(df['Date'])
         fig_compare = px.bar(df,
                              x='Time',
                              y='Sales', text_auto=True,
