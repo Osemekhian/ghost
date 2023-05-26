@@ -58,8 +58,8 @@ def update(a,b,c):
     date_string = date_object.strftime('%#m/%#d/%Y')
     filter = df[df.Date == date_string]
     filter = filter[filter.Store == b]
-    if len(filter)==0:
-        return html.P("No Feedback :( Try again!")
+#     if len(filter)==0:
+#         return html.P("No Feedback :( Try again!")
     fig = px.bar(filter,
                   x='Time',
                   y='Sales',text_auto=True,
