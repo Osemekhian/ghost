@@ -56,7 +56,7 @@ def update(a,b,c):
 #     df= pd.read_csv('https://raw.githubusercontent.com/Osemekhian/ghost/main/data.csv')
     date_object = date.fromisoformat(a)
     date_string = date_object.strftime('%#m/%#d/%Y')
-    df = df[df.Date == date_string]
+#     df = df[df.Date == date_string]
     df = df[df.Store == b]
 #     if len(filter)==0:
 #         return html.P("No Feedback :( Try again!")
