@@ -165,6 +165,6 @@ def update(col1,b,c,y,z,store):
 if __name__ == '__main__':
     my_app.run_server(
         debug=True,
-        port=8080
+        port=8080,
         host="0.0.0.0",
     )
