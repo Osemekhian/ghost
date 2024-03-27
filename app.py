@@ -30,7 +30,7 @@ def stock_df(start,end,symbols):
 
 #===========================================
 my_app= dash.Dash(__name__,external_stylesheets=[dbc.themes.SOLAR]) #dbc.themes.MORPH
-
+server= my_app.server
 my_app.layout = html.Div([
     html.H1("Stocks/Crypto Price Dashboard"),
     html.H6("By: Osemekhian Ehilen | Data Source: Yahoo API"), html.Br(),
@@ -164,7 +164,7 @@ def update(col1,b,c,y,z,store):
 
 if __name__ == '__main__':
     my_app.run_server(
-        debug=False,
-        port=random.randint(8000, 9999),  # 8080
-        host="127.0.0.1",
+        debug=True,
+        port=8080
+        host="0.0.0.0",
     )
