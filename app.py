@@ -141,7 +141,7 @@ def update(col1,a,z,check,store):
 @my_app.callback(
     Output('singleout','children'),
     [Input('drop1','value'),
-     Inpu('drop22','value'),
+     Input('drop22','value'),
      Input('start1','date'),
      Input('start', 'start_date'),
      Input('start', 'end_date'),
