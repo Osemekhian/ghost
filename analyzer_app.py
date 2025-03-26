@@ -301,6 +301,7 @@ def charts(data, columns, rad, button):
                 fig2 = px.box(df, x=columns[0], y=columns[-1], title=f"Box Plot for {columns[0]} & {columns[-1]}") #points='all',
                 fig3 = px.scatter(df, x=columns[0], y=columns[-1], title=f"Scatter Plot for {columns[0]} & {columns[-1]}")
                 fig4= px.imshow(cor, text_auto=True, title=f"Heatmap Correlation Plot",aspect="auto")
+                fig4.update_xaxes(side="top")
                 fig5 = px.pie(df, values=columns[0], names=columns[-1], hole=0.1, title=f"Pie Plot for {columns[0]} & {columns[-1]}")
                 fig = px.bar(df, x=columns[0], y=columns[-1], title=f"Bar Plot for {columns[0]} & {columns[-1]}")
 
