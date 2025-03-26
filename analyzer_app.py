@@ -297,7 +297,7 @@ def charts(data, columns, rad, button):
             if rad:
                 columns= columns[:2]
                 df = pd.read_json(data, orient='table')
-                cor= df.corr(numeric_only=True)
+                cor= df.corr(numeric_only=True).round(2)
                 fig2 = px.box(df, x=columns[0], y=columns[-1], title=f"Box Plot for {columns[0]} & {columns[-1]}") #points='all',
                 fig3 = px.scatter(df, x=columns[0], y=columns[-1], title=f"Scatter Plot for {columns[0]} & {columns[-1]}")
                 fig4= px.imshow(cor, text_auto=True, title=f"Heatmap Correlation Plot",aspect="auto")
