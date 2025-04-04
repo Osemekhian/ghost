@@ -1,5 +1,7 @@
 import dash as dash
-from dash import dcc,dash_table
+from dash import dcc,dash_table,State
+import joblib, base64
+from io import BytesIO
 from dash import html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
@@ -15,8 +17,9 @@ from sklearn.preprocessing import LabelEncoder
 #from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.linear_model import LinearRegression, LogisticRegression, Ridge, Lasso, ElasticNet
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor, GradientBoostingRegressor, GradientBoostingClassifier
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor, GradientBoostingRegressor, GradientBoostingClassifier,AdaBoostClassifier,AdaBoostRegressor
 from sklearn.svm import SVC, SVR
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.metrics import accuracy_score, mean_squared_error, confusion_matrix, mean_absolute_error, classification_report, r2_score
@@ -25,7 +28,7 @@ style={'textAlign':'center'}
 steps=0.1
 random_state= 42
 marks= lambda min,max:{i:f"{i}" for i in range(min,max)}
-models= ['LinearRegression','LogisticRegression','RandomForestRegressor','RandomForestClassifier',
+models= ['LinearRegression','LogisticRegression','RandomForestRegressor','RandomForestClassifier','AdaBoostClassifier','AdaBoostRegressor',
          'GradientBoostingRegressor','GradientBoostingClassifier','SVM Regression',
          'SVM Classification', 'Naive Bayes Classifier','KNeighborsClassifier','KNeighborsRegressor',
          'Ridge Regression','Lasso Regression','ElasticNet Regression']
@@ -136,6 +139,18 @@ def preprocess(df, target, features):
 
     return tsf, sc, x_train, x_test, y_train, y_test
 
+def convert_string_to_appropriate_type(s):
+    try:
+        return int(s)
+    except ValueError:
+        try:
+            return float(s)
+        except ValueError:
+            return s
+
+def convert_list(lst):
+    return [convert_string_to_appropriate_type(item) for item in lst]
+
 #===========================================
 
 my_app= dash.Dash(__name__,external_stylesheets=[dbc.themes.MORPH]) #dbc.themes.MORPH | dbc.themes.SOLAR
@@ -183,7 +198,15 @@ my_app.layout= html.Div([
     html.Button("Analyze",id='btn_analyze'), html.Br(),html.Br(),
 
     html.Div(id='modelout'),
-    html.Br(),html.Br(),
+    dcc.Store(id='store2'),dcc.Store(id='store3lt'),dcc.Store(id='store4sc'),
+    html.Br(),
+
+    html.H4("Prediction Arena"),
+    html.Pre('Insert the appropriate features for prediction'),
+    dbc.Input(id='in2',placeholder='type in the features seperated by comma...', type='text'),
+    html.Br(),
+    html.Div(id='predout'), html.Br(),
+         
     dcc.Markdown("Bravelion | 2025 | Contact for Analysis: [email](mailto:oseme781227@gmail.com) ")
 ], style=style)
 
@@ -310,6 +333,9 @@ def charts(data, columns, rad, button):
         return ""
 #======================================================================================
 @my_app.callback(Output('modelout','children'),
+                 Output('store2', 'data'),
+                 Output('store3lt', 'data'),
+                 Output('store4sc', 'data'),
                  [Input('store1','data'),
                   Input('modeldrp','value'),
                   Input('moddrp', 'value'),
@@ -367,6 +393,26 @@ def out1( data, model_type, target, features, btn_analyze):
                         random_state=42,
                         n_jobs=-1,  # Use all available CPU cores
                     )
+
+                elif model_type == 'AdaBoostClassifier':
+                    model = AdaBoostClassifier(random_state=42)
+                    param_dist = {
+                        'n_estimators': randint(50, 100),  # Number of weak learners
+                        'learning_rate': uniform(0.001, 1.0),  # Learning rate
+                        'base_estimator': [DecisionTreeClassifier(max_depth=1), DecisionTreeClassifier(max_depth=2)],
+                        'algorithm': ['SAMME', 'SAMME.R'],  # Algorithm to use
+                    }
+                    # Initialize RandomizedSearchCV
+                    random_search = RandomizedSearchCV(
+                        estimator=model,
+                        param_distributions=param_dist,
+                        n_iter=5,  # Number of parameter settings to sample
+                        scoring='accuracy',  # Metric to evaluate
+                        cv=5,  # Number of cross-validation folds
+                        random_state=42,
+                        n_jobs=-1,
+                    )
+                     
                 elif model_type == 'GradientBoostingClassifier':
                     model= GradientBoostingClassifier(random_state=random_state)
                     param_dist = {
@@ -466,6 +512,26 @@ def out1( data, model_type, target, features, btn_analyze):
                         estimator=model,
                         param_distributions=param_dist,
                         n_iter=2,  # Number of parameter settings to sample
+                        scoring='neg_mean_squared_error',  # Metric to evaluate (negative MSE for regression)
+                        cv=5,  # Number of cross-validation folds
+                        random_state=42,
+                        n_jobs=-1,  # Use all available CPU cores
+                    )
+                elif model_type == 'AdaBoostRegressor':
+                    model = AdaBoostRegressor(random_state=42)
+
+                    # Define the parameter grid
+                    param_dist = {
+                        'n_estimators': randint(50, 100),  # Number of weak learners
+                        'learning_rate': uniform(0.001, 1.0),  # Learning rate
+                        'base_estimator': [DecisionTreeRegressor(max_depth=3), DecisionTreeRegressor(max_depth=5)],
+                        'loss': ['linear', 'square', 'exponential'],  # Loss function
+                    }
+                    # Initialize RandomizedSearchCV
+                    random_search = RandomizedSearchCV(
+                        estimator=model,
+                        param_distributions=param_dist,
+                        n_iter=5,  # Number of parameter settings to sample
                         scoring='neg_mean_squared_error',  # Metric to evaluate (negative MSE for regression)
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
@@ -588,6 +654,25 @@ def out1( data, model_type, target, features, btn_analyze):
 
             if df[target].dtype == 'object':
                 random_search.fit(x_train, y_train)
+                #=====
+                buffer = BytesIO()
+                joblib.dump(random_search, buffer)  # Write to in-memory buffer
+                buffer.seek(0)  # Reset buffer position to read later
+                model_bytes = buffer.getvalue()  # Get raw bytes
+                model_base64 = base64.b64encode(model_bytes).decode("utf-8")
+
+                buffer2 = BytesIO()
+                joblib.dump(label_transform, buffer2)  # Write to in-memory buffer
+                buffer2.seek(0)  # Reset buffer position to read later
+                lt_bytes = buffer2.getvalue()  # Get raw bytes
+                lt_base64 = base64.b64encode(lt_bytes).decode("utf-8")
+
+                buffer3 = BytesIO()
+                joblib.dump(standard_scaler, buffer3)  # Write to in-memory buffer
+                buffer3.seek(0)  # Reset buffer position to read later
+                sc_bytes = buffer3.getvalue()  # Get raw bytes
+                sc_base64 = base64.b64encode(sc_bytes).decode("utf-8")
+                #=====
                 y_pred = random_search.best_estimator_.predict(x_test)
                 score = accuracy_score(y_test, y_pred)
                 cm = confusion_matrix(y_test, y_pred)
@@ -597,9 +682,28 @@ def out1( data, model_type, target, features, btn_analyze):
                 return html.Div([html.P(f"The metrics below are based on the test set of your data for {model_type}:"),
                                  html.P(f"Accuracy Score:{score}"), html.Pre(report),
                                  html.P('Confusion Matrix'),html.Pre(cm_df.to_string()),
-                                 dcc.Graph(figure=fig), html.Pre(f"Best Parameters for {model_type}\n {random_search.best_params_}")])
+                                 dcc.Graph(figure=fig), html.Pre(f"Best Parameters for {model_type}\n {random_search.best_params_}")]),model_base64, lt_base64, sc_base64
             else:
                 random_search.fit(x_train, y_train)
+                #=====
+                buffer = BytesIO()
+                joblib.dump(random_search, buffer)  # Write to in-memory buffer
+                buffer.seek(0)  # Reset buffer position to read later
+                model_bytes = buffer.getvalue()  # Get raw bytes
+                model_base64 = base64.b64encode(model_bytes).decode("utf-8")
+
+                buffer2 = BytesIO()
+                joblib.dump(label_transform, buffer2)  # Write to in-memory buffer
+                buffer2.seek(0)  # Reset buffer position to read later
+                lt_bytes = buffer2.getvalue()  # Get raw bytes
+                lt_base64 = base64.b64encode(lt_bytes).decode("utf-8")
+
+                buffer3 = BytesIO()
+                joblib.dump(standard_scaler, buffer3)  # Write to in-memory buffer
+                buffer3.seek(0)  # Reset buffer position to read later
+                sc_bytes = buffer3.getvalue()  # Get raw bytes
+                sc_base64 = base64.b64encode(sc_bytes).decode("utf-8")
+                #=====
                 if model_type == 'LinearRegression':
                     y_pred = random_search.predict(x_test)
                     mse = round(mean_squared_error(y_test, y_pred), 4)
@@ -617,7 +721,7 @@ def out1( data, model_type, target, features, btn_analyze):
                         [html.P(f"The metrics below are based on the test set of your data for {model_type}:"),
                          html.P(f"Mean Squared Error:{mse}"), html.P(f"Root Mean Squared Error:{rmse}"),
                          html.P(f"Mean Absolute Error:{mae}"), html.P(f"R-Squared:{r2}"),
-                         html.P(f"Adjusted R-Squared:{adj_r2}"), dcc.Graph(figure=fig)])
+                         html.P(f"Adjusted R-Squared:{adj_r2}"), dcc.Graph(figure=fig)]),model_base64, lt_base64, sc_base64
                 else:
                     y_pred = random_search.best_estimator_.predict(x_test)
                     mse= round(mean_squared_error(y_test,y_pred),4)
@@ -636,10 +740,10 @@ def out1( data, model_type, target, features, btn_analyze):
                                      html.P(f"Mean Absolute Error:{mae}"),html.P(f"R-Squared:{r2}"),
                                      html.P(f"Adjusted R-Squared:{adj_r2}"),
                                      html.Pre(f"Best Parameters for {model_type}\n {random_search.best_params_}"),
-                                     dcc.Graph(figure=fig)])
+                                     dcc.Graph(figure=fig)]),model_base64, lt_base64, sc_base64
 
     except:
-        return ""
+        return "","","",""
 #======================================================================================
 
 @my_app.callback(Output('download-data-cleaned','data'),
@@ -651,6 +755,50 @@ def out(value, data, n_clicks):
         df = pd.read_json(data, orient='table')
         return dcc.send_data_frame(df.to_csv, 'cleaned_data.csv')
 
+
+@my_app.callback(Output('predout','children'),
+                 [Input('store2','data'),
+                  Input('store3lt','data'),
+                  Input('store4sc','data'),
+                  Input('in2','value'),
+                  Input('btn_analyze', 'n_clicks')])
+def dope(model_base64,lt,sc,row_data, n_clicks):
+    try:
+        if n_clicks:
+            lisy = row_data.split(',')
+            df = pd.DataFrame(columns=lisy)
+            df.loc[0] = convert_list(lisy)  # list
+            categorical_columns = df.select_dtypes(include=['object']).columns
+            for i in categorical_columns:
+                df[i] = LabelEncoder().fit_transform(df[i])
+            x = df.values
+
+            model_bytes= base64.b64decode(model_base64.encode("utf-8"))
+            # 2. Deserialize the model (using BytesIO)
+            buffer = BytesIO(model_bytes)
+            trained_model = joblib.load(buffer)  # Load from bytes
+
+            lt_bytes = base64.b64decode(lt.encode("utf-8"))
+            # 2. Deserialize
+            buffer2 = BytesIO(lt_bytes)
+            label_tranform = joblib.load(buffer2)  # Load from bytes
+
+            sc_bytes = base64.b64decode(sc.encode("utf-8"))
+            # 2. Deserialize
+            buffer3 = BytesIO(sc_bytes)
+            standard_scaler = joblib.load(buffer3)  # Load from bytes
+
+            if label_tranform is None:
+                x= standard_scaler.transform(x)
+                pred= trained_model.predict(x)
+                return html.Div([html.Pre(f"Prediction: {pred}")])
+            else:
+                x = standard_scaler.transform(x)
+                pred = trained_model.predict(x)
+                pred= label_tranform.inverse_transform(pred)
+                return html.Div([html.Pre(f"Prediction: {pred}")])
+    except:
+        return html.Pre(f"...No Prediction Yet...")
 
 
 if __name__ == '__main__':
