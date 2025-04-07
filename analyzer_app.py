@@ -181,15 +181,19 @@ my_app.layout= html.Div([
                     then Generates Your Analysis & Model"""),
     dbc.Input(id="in1",placeholder="Paste Link to Your Data...",type='text', size="lg", className="mb-3"),
     html.Pre('For example: https://raw.githubusercontent.com/datasciencedojo/datasets/refs/heads/master/titanic.csv'),
-    dcc.Upload(id='upload-data',children=html.Div(['Drag and Drop or ',html.A('Select Data File')]),style={
-        'width': '100%',
+    html.Div([dcc.Upload(id='upload-data',children=html.Div(['Drag and Drop or ',html.A('Select Data File')]),style={
+        'width': '50%',
         'height': '60px',
         'lineHeight': '60px',
         'borderWidth': '1px',
         'borderStyle': 'dashed',
         'borderRadius': '5px',
-        'textAlign': 'center'
-    }),
+        'textAlign': 'center',
+        'background-color':'#9DE3B3',
+        'color':'white',
+        'align-items':'center',
+        'margin':'auto'
+    })]),
     html.Br(),
     dcc.RadioItems(options=['Raw Data', 'Cleaned Data'], value='Raw Data', id='radio'),
     html.Button("Download Cleaned Data",id='btn_csv'),html.Br(),
