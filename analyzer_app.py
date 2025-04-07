@@ -2,6 +2,7 @@ import dash as dash
 from dash import dcc,dash_table,State
 import joblib, base64
 from io import BytesIO
+import io
 from dash import html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
@@ -151,6 +152,23 @@ def convert_string_to_appropriate_type(s):
 def convert_list(lst):
     return [convert_string_to_appropriate_type(item) for item in lst]
 
+def parse_contents(contents, filename):
+    content_type, content_string = contents.split(',')
+
+    decoded = base64.b64decode(content_string)
+    try:
+        if 'csv' in filename:
+            # Assume that the user uploaded a CSV file
+            df = pd.read_csv(
+                io.StringIO(decoded.decode('utf-8')))
+            return df
+        elif 'xls' in filename:
+            # Assume that the user uploaded an excel file
+            df = pd.read_excel(io.BytesIO(decoded))
+            return df
+    except:
+        return ""
+             
 #===========================================
 
 my_app= dash.Dash(__name__,external_stylesheets=[dbc.themes.MORPH]) #dbc.themes.MORPH | dbc.themes.SOLAR
@@ -163,6 +181,16 @@ my_app.layout= html.Div([
                     then Generates Your Analysis & Model"""),
     dbc.Input(id="in1",placeholder="Paste Link to Your Data...",type='text', size="lg", className="mb-3"),
     html.Pre('For example: https://raw.githubusercontent.com/datasciencedojo/datasets/refs/heads/master/titanic.csv'),
+    dcc.Upload(id='upload-data',children=html.Div(['Drag and Drop or ',html.A('Select Data File')]),style={
+        'width': '100%',
+        'height': '60px',
+        'lineHeight': '60px',
+        'borderWidth': '1px',
+        'borderStyle': 'dashed',
+        'borderRadius': '5px',
+        'textAlign': 'center'
+    }),
+    html.Br(),
     dcc.RadioItems(options=['Raw Data', 'Cleaned Data'], value='Raw Data', id='radio'),
     html.Button("Download Cleaned Data",id='btn_csv'),html.Br(),
     dcc.Download(id='download-data-cleaned'), html.Br(),
@@ -220,73 +248,143 @@ my_app.layout= html.Div([
                       Output('moddrp','options'),
                       Output('mod2drp','options')],
                     [Input('in1','value'),
+                     Input('upload-data','contents'),
+                     State('upload-data','filename'),
                      Input('radio','value'),
                      Input('outlier','value'),
                      Input('drp','value')]
                 )
-def link(text, rad, button, drpval):
-    if text==None:
-        return ""
-    try:
-        if button:
-            data= pd.read_csv(text,low_memory=False)
-            data.columns = (data.columns.str.strip().str.lower().str.replace(" ", "_").str.replace(
-                "[()$@!#%^&*-=+~`/\|]", "", regex=True))
+def link(text,contents, filename, rad, button, drpval):
+    #if text==None:
+    #    return ""
+    if contents is not None:
+        try:
+            if button:
+                data = parse_contents(contents, filename)
+                data.columns = (data.columns.str.strip().str.lower().str.replace(" ", "_").str.replace(
+                    "[()$@!#%^&*-=+~`/\|]", "", regex=True))
 
-            if rad== 'Cleaned Data':
-                data= cleaner(data)
-                if data[drpval].dtype == 'object':
-                    pass
+                if rad == 'Cleaned Data':
+                    data = cleaner(data)
+                    if data[drpval].dtype == 'object':
+                        pass
+                    else:
+                        data = remove_outliers(data, drpval)
                 else:
-                    data= remove_outliers(data, drpval)
+                    data = remove_outliers(data, drpval)
             else:
-                data = remove_outliers(data, drpval)
-        else:
-            data = pd.read_csv(text, low_memory=False)
-            data.columns = (data.columns.str.strip().str.lower().str.replace(" ", "_").str.replace(
-                "[()$@!#%^&*-=+~`/\|]", "", regex=True))
+                data = parse_contents(contents, filename)
+                data.columns = (data.columns.str.strip().str.lower().str.replace(" ", "_").str.replace(
+                    "[()$@!#%^&*-=+~`/\|]", "", regex=True))
 
-        if rad == 'Raw Data':
-            df= data
-            options = [{'label': col, 'value': col} for col in df.columns]
-            desc = df.describe()
-            desc.insert(0, 'stat', df.describe().index)
-            return (html.Div(dash_table.DataTable(df.to_dict('records'),
-                                                  [{"name": i, "id": i} for i in df.columns],
-                                                  style_cell={'textAlign': 'left', 'padding': '5px'},
-                                                  style_header={'backgroundColor': 'rgb(220, 220, 220)',
-                                                                'fontWeight': 'bold'},
-                                                  page_size=10,
-                                                  style_data={"overflow": "hidden", "textOverflow": "ellipsis",
-                                                              "maxWidth": 0})), html.H3("Data Description"),
-                    html.Div(dash_table.DataTable(desc.to_dict('records'),
-                                                  [{"name": i, "id": i} for i in desc.columns],
-                                                  style_cell={'textAlign': 'left', 'padding': '5px'},
-                                                  style_header={'backgroundColor': 'rgb(220, 220, 220)',
-                                                                'fontWeight': 'bold'},
-                                                  page_size=20,
-                                                  style_data={"overflow": "hidden", "textOverflow": "ellipsis",
-                                                              "maxWidth": 0})),
-                    df.to_json(orient='table'), options, options, options,options,options)
-        else:
-            df= cleaner(data)
-            options = [{'label': col, 'value': col} for col in df.columns]
-            desc = df.describe()
-            desc.insert(0, 'stat', df.describe().index)
-            return (html.Div(dash_table.DataTable(df.to_dict('records'),
-                                          [{"name": i, "id": i} for i in df.columns],
-                                          style_cell={'textAlign': 'left','padding':'5px'},
-                                          style_header={'backgroundColor':  'rgb(220, 220, 220)','fontWeight': 'bold'},
-                                                 page_size=10, style_data={"overflow":"hidden","textOverflow":"ellipsis",
-                                                                           "maxWidth":0})),html.H3("Data Description"),html.Div(dash_table.DataTable(desc.to_dict('records'),
-                                          [{"name": i, "id": i} for i in desc.columns],
-                                          style_cell={'textAlign': 'left','padding':'5px'},
-                                          style_header={'backgroundColor':  'rgb(220, 220, 220)','fontWeight': 'bold'},
-                                                 page_size=20, style_data={"overflow":"hidden","textOverflow":"ellipsis",
-                                                                           "maxWidth":0})),
-                    df.to_json(orient='table'), options,options, options, options,options)
-    except:
-        return ""
+            if rad == 'Raw Data':
+                df = data
+                options = [{'label': col, 'value': col} for col in df.columns]
+                desc = df.describe()
+                desc.insert(0, 'stat', df.describe().index)
+                return (html.Div(dash_table.DataTable(df.to_dict('records'),
+                                                      [{"name": i, "id": i} for i in df.columns],
+                                                      style_cell={'textAlign': 'left', 'padding': '5px'},
+                                                      style_header={'backgroundColor': 'rgb(220, 220, 220)',
+                                                                    'fontWeight': 'bold'},
+                                                      page_size=10,
+                                                      style_data={"overflow": "hidden", "textOverflow": "ellipsis",
+                                                                  "maxWidth": 0})), html.H3("Data Description"),
+                        html.Div(dash_table.DataTable(desc.to_dict('records'),
+                                                      [{"name": i, "id": i} for i in desc.columns],
+                                                      style_cell={'textAlign': 'left', 'padding': '5px'},
+                                                      style_header={'backgroundColor': 'rgb(220, 220, 220)',
+                                                                    'fontWeight': 'bold'},
+                                                      page_size=20,
+                                                      style_data={"overflow": "hidden", "textOverflow": "ellipsis",
+                                                                  "maxWidth": 0})),
+                        df.to_json(orient='table'), options, options, options, options, options)
+            else:
+                df = cleaner(data)
+                options = [{'label': col, 'value': col} for col in df.columns]
+                desc = df.describe()
+                desc.insert(0, 'stat', df.describe().index)
+                return (html.Div(dash_table.DataTable(df.to_dict('records'),
+                                                      [{"name": i, "id": i} for i in df.columns],
+                                                      style_cell={'textAlign': 'left', 'padding': '5px'},
+                                                      style_header={'backgroundColor': 'rgb(220, 220, 220)',
+                                                                    'fontWeight': 'bold'},
+                                                      page_size=10,
+                                                      style_data={"overflow": "hidden", "textOverflow": "ellipsis",
+                                                                  "maxWidth": 0})), html.H3("Data Description"),
+                        html.Div(dash_table.DataTable(desc.to_dict('records'),
+                                                      [{"name": i, "id": i} for i in desc.columns],
+                                                      style_cell={'textAlign': 'left', 'padding': '5px'},
+                                                      style_header={'backgroundColor': 'rgb(220, 220, 220)',
+                                                                    'fontWeight': 'bold'},
+                                                      page_size=20,
+                                                      style_data={"overflow": "hidden", "textOverflow": "ellipsis",
+                                                                  "maxWidth": 0})),
+                        df.to_json(orient='table'), options, options, options, options, options)
+        except:
+            return ""
+    else:
+    #======
+        try:
+            if button:
+                data= pd.read_csv(text,low_memory=False)
+                data.columns = (data.columns.str.strip().str.lower().str.replace(" ", "_").str.replace(
+                    "[()$@!#%^&*-=+~`/\|]", "", regex=True))
+
+                if rad== 'Cleaned Data':
+                    data= cleaner(data)
+                    if data[drpval].dtype == 'object':
+                        pass
+                    else:
+                        data= remove_outliers(data, drpval)
+                else:
+                    data = remove_outliers(data, drpval)
+            else:
+                data = pd.read_csv(text, low_memory=False)
+                data.columns = (data.columns.str.strip().str.lower().str.replace(" ", "_").str.replace(
+                    "[()$@!#%^&*-=+~`/\|]", "", regex=True))
+
+            if rad == 'Raw Data':
+                df= data
+                options = [{'label': col, 'value': col} for col in df.columns]
+                desc = df.describe()
+                desc.insert(0, 'stat', df.describe().index)
+                return (html.Div(dash_table.DataTable(df.to_dict('records'),
+                                                      [{"name": i, "id": i} for i in df.columns],
+                                                      style_cell={'textAlign': 'left', 'padding': '5px'},
+                                                      style_header={'backgroundColor': 'rgb(220, 220, 220)',
+                                                                    'fontWeight': 'bold'},
+                                                      page_size=10,
+                                                      style_data={"overflow": "hidden", "textOverflow": "ellipsis",
+                                                                  "maxWidth": 0})), html.H3("Data Description"),
+                        html.Div(dash_table.DataTable(desc.to_dict('records'),
+                                                      [{"name": i, "id": i} for i in desc.columns],
+                                                      style_cell={'textAlign': 'left', 'padding': '5px'},
+                                                      style_header={'backgroundColor': 'rgb(220, 220, 220)',
+                                                                    'fontWeight': 'bold'},
+                                                      page_size=20,
+                                                      style_data={"overflow": "hidden", "textOverflow": "ellipsis",
+                                                                  "maxWidth": 0})),
+                        df.to_json(orient='table'), options, options, options,options,options)
+            else:
+                df= cleaner(data)
+                options = [{'label': col, 'value': col} for col in df.columns]
+                desc = df.describe()
+                desc.insert(0, 'stat', df.describe().index)
+                return (html.Div(dash_table.DataTable(df.to_dict('records'),
+                                              [{"name": i, "id": i} for i in df.columns],
+                                              style_cell={'textAlign': 'left','padding':'5px'},
+                                              style_header={'backgroundColor':  'rgb(220, 220, 220)','fontWeight': 'bold'},
+                                                     page_size=10, style_data={"overflow":"hidden","textOverflow":"ellipsis",
+                                                                               "maxWidth":0})),html.H3("Data Description"),html.Div(dash_table.DataTable(desc.to_dict('records'),
+                                              [{"name": i, "id": i} for i in desc.columns],
+                                              style_cell={'textAlign': 'left','padding':'5px'},
+                                              style_header={'backgroundColor':  'rgb(220, 220, 220)','fontWeight': 'bold'},
+                                                     page_size=20, style_data={"overflow":"hidden","textOverflow":"ellipsis",
+                                                                               "maxWidth":0})),
+                        df.to_json(orient='table'), options,options, options, options,options)
+        except:
+            return ""
 
 @my_app.callback(Output('uni','children'),
                  [Input('store1','data'),
