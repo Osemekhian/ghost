@@ -208,7 +208,7 @@ my_app.layout= html.Div([
         'borderStyle': 'dashed',
         'borderRadius': '5px',
         'textAlign': 'center',
-        'background-color':'#9DE3B3',
+        'background-color':'#485785',
         'color':'white',
         'align-items':'center',
         'margin':'auto'
