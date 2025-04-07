@@ -173,6 +173,7 @@ def parse_contents(contents, filename):
 
 my_app= dash.Dash(__name__,external_stylesheets=[dbc.themes.MORPH]) #dbc.themes.MORPH | dbc.themes.SOLAR
 server = my_app.server
+my_app.title= "Data Analyzer"
 my_app.layout= html.Div([
     html.P(""),
     html.H1("Data Analyzer"),
