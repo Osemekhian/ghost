@@ -173,7 +173,25 @@ def parse_contents(contents, filename):
 
 my_app= dash.Dash(__name__,external_stylesheets=[dbc.themes.MORPH]) #dbc.themes.MORPH | dbc.themes.SOLAR
 server = my_app.server
-my_app.title= "Data Analyzer"
+my_app.index_string='''
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>Data Analyzer</title>
+        <link rel="icon" href="https://raw.githubusercontent.com/Osemekhian/ghost/refs/heads/main/file-HFcKPxRscWybi9pdrJfJ8e.webp" type="image/x-icon">
+        {%css%}
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+'''
 my_app.layout= html.Div([
     html.P(""),
     html.H1("Data Analyzer"),
