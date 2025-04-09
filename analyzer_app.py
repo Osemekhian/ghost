@@ -26,6 +26,16 @@ from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.metrics import accuracy_score, mean_squared_error, confusion_matrix, mean_absolute_error, classification_report, r2_score
 from scipy.stats import uniform, randint, uniform, loguniform
 style={'textAlign':'center'}
+style2={'width': '50%',
+        'borderWidth': '1px',
+        'borderStyle': 'dashed',
+        'borderRadius': '5px',
+        'textAlign': 'center',
+        'background-color':'#485785',
+        'color':'white',
+        'align-items':'center',
+        'margin':'auto'
+    }
 steps=0.1
 random_state= 42
 marks= lambda min,max:{i:f"{i}" for i in range(min,max)}
@@ -803,7 +813,7 @@ def out1( data, model_type, target, features, btn_analyze):
                 return html.Div([html.P(f"The metrics below are based on the test set of your data for {model_type}:"),
                                  html.P(f"Accuracy Score:{score}"), html.Pre(report),
                                  html.P('Confusion Matrix'),html.Pre(cm_df.to_string()),
-                                 dcc.Graph(figure=fig), html.Pre(f"Best Parameters for {model_type}\n {random_search.best_params_}")]),model_base64, lt_base64, sc_base64
+                                 dcc.Graph(figure=fig), html.Pre(f"Best Parameters for {model_type}\n {random_search.best_params_}")],style=style2),model_base64, lt_base64, sc_base64
             else:
                 random_search.fit(x_train, y_train)
                 #=====
@@ -842,7 +852,7 @@ def out1( data, model_type, target, features, btn_analyze):
                         [html.P(f"The metrics below are based on the test set of your data for {model_type}:"),
                          html.P(f"Mean Squared Error:{mse}"), html.P(f"Root Mean Squared Error:{rmse}"),
                          html.P(f"Mean Absolute Error:{mae}"), html.P(f"R-Squared:{r2}"),
-                         html.P(f"Adjusted R-Squared:{adj_r2}"), dcc.Graph(figure=fig)]),model_base64, lt_base64, sc_base64
+                         html.P(f"Adjusted R-Squared:{adj_r2}"), dcc.Graph(figure=fig)],style=style2),model_base64, lt_base64, sc_base64
                 else:
                     y_pred = random_search.best_estimator_.predict(x_test)
                     mse= round(mean_squared_error(y_test,y_pred),4)
@@ -861,7 +871,7 @@ def out1( data, model_type, target, features, btn_analyze):
                                      html.P(f"Mean Absolute Error:{mae}"),html.P(f"R-Squared:{r2}"),
                                      html.P(f"Adjusted R-Squared:{adj_r2}"),
                                      html.Pre(f"Best Parameters for {model_type}\n {random_search.best_params_}"),
-                                     dcc.Graph(figure=fig)]),model_base64, lt_base64, sc_base64
+                                     dcc.Graph(figure=fig)],style=style2),model_base64, lt_base64, sc_base64
 
     except:
         return "","","",""
