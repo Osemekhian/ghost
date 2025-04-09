@@ -26,7 +26,7 @@ from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.metrics import accuracy_score, mean_squared_error, confusion_matrix, mean_absolute_error, classification_report, r2_score
 from scipy.stats import uniform, randint, uniform, loguniform
 style={'textAlign':'center'}
-style2={'width': '50%',
+style2={'width': '80%',
         'borderWidth': '1px',
         'borderStyle': 'dashed',
         'borderRadius': '5px',
