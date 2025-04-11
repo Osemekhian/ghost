@@ -1,0 +1,12 @@
+numpy
+requires.io
+dash
+pybase64
+requests
+gunicorn
+dash-bootstrap-components
+dash-renderer
+dash-html-components
+dash-core-components
+random2
+qrcode
