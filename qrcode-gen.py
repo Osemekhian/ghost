@@ -51,7 +51,7 @@ app.layout = html.Div([
     html.Div(id='qr-code-container', style={'textAlign': 'center', 'margin': '20px'}),
 
     html.Div(id='download-container', style={'textAlign': 'center'}),
-    html.Div(dcc.Markdown("Bravelion | 2025 | Contact for Interactive Web App: [email](mailto:oseme781227@gmail.com) "), style={'textAlign': 'center'})
+    html.Div(dcc.Markdown("Bravelion | 2025 | Contact for Interactive Web App: [Osemekhian Ehilen](mailto:oseme781227@gmail.com) "), style={'textAlign': 'center'})
 ])
 
 
