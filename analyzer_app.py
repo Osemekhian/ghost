@@ -189,7 +189,7 @@ my_app.index_string='''
     <head>
         {%metas%}
         <title>Data Analyzer</title>
-        <link rel="icon" href="https://raw.githubusercontent.com/Osemekhian/ghost/refs/heads/main/file-HFcKPxRscWybi9pdrJfJ8e.webp" type="image/x-icon">
+        <link rel="icon" href="https://raw.githubusercontent.com/Bravelion2017/source/refs/heads/main/file-HFcKPxRscWybi9pdrJfJ8e.webp">
         {%css%}
     </head>
     <body>
