@@ -268,7 +268,7 @@ my_app.layout= html.Div([
     html.Br(),
     html.Div(id='predout'), html.Br(),
          
-    dcc.Markdown("Bravelion | 2025 | Contact for Analysis: [email](mailto:oseme781227@gmail.com) ")
+    dcc.Markdown("Bravelion | 2025 | Contact for Analysis: [Osemekhian Ehilen](mailto:oseme781227@gmail.com) ")
 ], style=style)
 
 @my_app.callback([Output('out1','children'),
