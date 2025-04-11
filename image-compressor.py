@@ -10,7 +10,7 @@ style= {'textAlign': 'center',
         'width':'100%'}
 
 app = dash.Dash(__name__,external_stylesheets=[dbc.themes.SUPERHERO])
-
+server= app.server
 # Compression function
 def resize_and_compress_image(image_bytes, target_kb, max_width=800, max_height=800, quality_step=5, min_quality=10):
     img = Image.open(io.BytesIO(image_bytes))
@@ -149,8 +149,8 @@ def compress_and_show(n_clicks, contents, target_kb, max_width, max_height):
         return f"Error: {str(e)}", "", ""
 
 if __name__ == '__main__':
-    app.run(
-        debug=False,
-        port=random.randint(8000, 9999),  # 8080
-        host="127.0.0.1",
+    my_app.run_server(
+        debug = True,
+        host= '0.0.0.0',
+        port= 8080
     )
