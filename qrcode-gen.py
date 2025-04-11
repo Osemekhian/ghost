@@ -6,7 +6,7 @@ import base64
 import dash_bootstrap_components as dbc
 
 app = dash.Dash(__name__,external_stylesheets=[dbc.themes.QUARTZ])
-app.title= "QR-Code Generator"
+server= app.server
 
 app.index_string='''
 <!DOCTYPE html>
@@ -109,8 +109,8 @@ def generate_qr_code(n_clicks, url):
 
 
 if __name__ == '__main__':
-    app.run(
-        debug=False,
-        port=random.randint(8000, 9999),  # 8080
-        host="127.0.0.1",
+    my_app.run_server(
+        debug = True,
+        host= '0.0.0.0',
+        port= 8080
     )
