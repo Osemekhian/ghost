@@ -86,7 +86,7 @@ app.layout = html.Div([
     html.Div(id='compressed-preview'),
     html.A('Download Compressed Image', id='download-link', href='', download='compressed.jpg', target='_blank'),
     html.Br(),
-dcc.Markdown("Bravelion | 2025 | Contact for Interactive Web App: [email](mailto:oseme781227@gmail.com) ")
+dcc.Markdown("Bravelion | 2025 | Contact for Interactive Web App: [Osemekhian Ehilen](mailto:oseme781227@gmail.com) ")
 ], style=style)
 
 
