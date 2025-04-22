@@ -39,10 +39,10 @@ style2={'width': '80%',
 steps=0.1
 random_state= 42
 marks= lambda min,max:{i:f"{i}" for i in range(min,max)}
-models= ['LinearRegression','LogisticRegression','RandomForestRegressor','RandomForestClassifier','AdaBoostClassifier','AdaBoostRegressor',
-         'GradientBoostingRegressor','GradientBoostingClassifier','SVM Regression',
+models= ['LinearRegression','LogisticRegression','RandomForestRegressor','RandomForestClassifier','SVM Regression',
          'SVM Classification', 'Naive Bayes Classifier','KNeighborsClassifier','KNeighborsRegressor',
          'Ridge Regression','Lasso Regression','ElasticNet Regression']
+# 'AdaBoostClassifier','AdaBoostRegressor','GradientBoostingRegressor','GradientBoostingClassifier'
 #===========================================
 # Data cleaner functions
 def remove_outliers(df,column):
