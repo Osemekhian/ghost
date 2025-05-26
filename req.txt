@@ -1,0 +1,13 @@
+numpy
+matplotlib
+pandas
+plotly
+dash
+gunicorn
+dash-bootstrap-components
+dash-renderer
+dash-html-components
+dash-core-components
+random2
+DateTime
+joblib
