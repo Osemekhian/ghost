@@ -11,3 +11,4 @@ dash-core-components
 random2
 DateTime
 joblib
+scipy
