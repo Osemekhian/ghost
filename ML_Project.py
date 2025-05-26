@@ -9,6 +9,7 @@ from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 import numpy as np
 import pandas as pd
+from scipy.spatial.distance import cdist
 import plotly.express as px
 import plotly.graph_objs as go
 # from plotly.subplots import make_subplots
@@ -185,13 +186,13 @@ def updater(a, b, c, d, e, f, g):
     return fig
 
 # RBF layout
-p2 = np.linspace(-3, 3, 1000)
+# p2 = np.linspace(-2, 2, 1000).reshape(-1,1)
 rbf_layout= html.Div([
     # Image and Graph row
     html.Div([
         html.Div([
             html.Br(),html.Br(),html.Br(),
-            html.Img(src="https://github.com/Osemekhian/ghost/blob/main/rbf.png?raw=true")
+            html.Img(src=b64_image("rbf.png"))
         ], style={'width': '48%', 'display': 'inline-block'}),
 
         html.Div([
@@ -203,21 +204,39 @@ rbf_layout= html.Div([
 
     dbc.Row([
         dbc.Col([  # Left column for sliders (4 sliders)
-            html.P('b1'),
-            dcc.Slider(id='b1',
-                       min=-5,
-                       max=5,
-                       value=1,
+            html.P('b11'),
+            dcc.Slider(id='b11_',
+                       min=-2,
+                       max=2,
+                       value=2,
+                       step=0.1,
+                       marks={i: f"{i}" for i in range(-10, 10, 1)},
+                       tooltip={"placement": "bottom", "always_visible": False}
+                       ),
+            html.P('b12'),
+            dcc.Slider(id='b12_',
+                       min=-2,
+                       max=2,
+                       value=2,
                        step=0.1,
                        marks={i: f"{i}" for i in range(-10, 10, 1)},
                        tooltip={"placement": "bottom", "always_visible": False}
                        ),
 
-            html.P('w1'),
-            dcc.Slider(id='w1',
-                       min=-5,
-                       max=5,
-                       value=0,
+            html.P('w11'),
+            dcc.Slider(id='w11_',
+                       min=-2,
+                       max=2,
+                       value=-1,
+                       step=0.1,
+                       marks={i: f"{i}" for i in range(-10, 10, 1)},
+                       tooltip={"placement": "bottom", "always_visible": False}
+                       ),
+            html.P('w12'),
+            dcc.Slider(id='w12_',
+                       min=-2,
+                       max=2,
+                       value=1,
                        step=0.1,
                        marks={i: f"{i}" for i in range(-10, 10, 1)},
                        tooltip={"placement": "bottom", "always_visible": False}
@@ -225,10 +244,19 @@ rbf_layout= html.Div([
         ], width=6),
 
         dbc.Col([  # Right column for sliders (3 sliders)
-            html.P('w2'),
-            dcc.Slider(id='w2',
-                       min=-5,
-                       max=5,
+            html.P('w21'),
+            dcc.Slider(id='w21_',
+                       min=-2,
+                       max=2,
+                       value=1,
+                       step=0.1,
+                       marks={i: f"{i}" for i in range(-10, 10, 1)},
+                       tooltip={"placement": "bottom", "always_visible": False}
+                       ),
+            html.P('w22'),
+            dcc.Slider(id='w22_',
+                       min=-2,
+                       max=2,
                        value=1,
                        step=0.1,
                        marks={i: f"{i}" for i in range(-10, 10, 1)},
@@ -236,8 +264,8 @@ rbf_layout= html.Div([
                        ),
             html.P('b2'),
             dcc.Slider(id='b2',
-                       min=-5,
-                       max=5,
+                       min=-2,
+                       max=2,
                        value=0,
                        step=0.1,
                        marks={i: f"{i}" for i in range(-10, 10, 1)},
@@ -250,16 +278,31 @@ rbf_layout= html.Div([
 ])
 
 @app.callback(Output('graph-4','figure'),
-              [Input('b1','value'),
-               Input('w1','value'),
-               Input('w2','value'),
-               Input('b2','value')])
-def updater(b1,w1,w2,b2):
-    n= p2.shape[0]
-    a1= (w1-p2)**2
-    a1= gaussian((np.sqrt(a1))*b1)
-    a2= purelin(w2*a1 + b2)
-    fig = px.line(x=p2, y=a2)
+              [Input('b11_','value'),
+               Input('b12_','value'),
+               Input('b2','value'),
+               Input('w11_','value'),
+               Input('w12_', 'value'),
+               Input('w21_', 'value'),
+               Input('w22_', 'value')
+               ])
+def updater(b11,b12,b2,w11,w12,w21,w22):
+    p = np.linspace(-2, 2, 400).reshape(-1,1)
+    W1 = np.array([[w11], [w12]])
+    b1 = np.array([b11, b12])
+    W2 = np.array([[w21, w22]])
+    b2 = np.array([b2])
+    p = np.atleast_2d(p)
+    if p.shape[1] != W1.shape[1]:  # If p is (n_samples,) reshape to (n_samples, R)
+        p = p.reshape(-1, W1.shape[1])
+    dist = cdist(p, W1, metric='euclidean')
+    dist= dist.T
+    n1 = dist * b1[:, np.newaxis]
+    a1 = gaussian(n1)
+    n2 = np.dot(W2, a1) + b2
+    a2 = n2.ravel()
+    fig = px.line(x=p.ravel(),y=a2)
+    #fig.update_yaxes(range=[-2, 2])
     return fig
 
 #================================
