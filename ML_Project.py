@@ -72,7 +72,7 @@ mlp_layout = html.Div([
     # Image and Graph row
     html.Div([
         html.Div([
-            html.Img(src=b64_image("function approximation image.png"))
+            html.Img(src="https://github.com/Osemekhian/ghost/blob/main/function%20approximation%20image.png?raw=true")
         ], style={'width': '48%', 'display': 'inline-block'}),
 
         html.Div([
@@ -191,7 +191,7 @@ rbf_layout= html.Div([
     html.Div([
         html.Div([
             html.Br(),html.Br(),html.Br(),
-            html.Img(src=b64_image("rbf.png"))
+            html.Img(src="https://github.com/Osemekhian/ghost/blob/main/rbf.png?raw=true")
         ], style={'width': '48%', 'display': 'inline-block'}),
 
         html.Div([
@@ -276,7 +276,7 @@ def update(tab):
 if __name__ == "__main__":
     app.run_server(
         debug=True,
-        port=8080
+        port=8080,
         host="0.0.0.0"
     )
 
