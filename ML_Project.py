@@ -54,7 +54,7 @@ def b64_image(image_filename):
 
 # The App
 app= dash.Dash(__name__,external_stylesheets=[dbc.themes.SKETCHY],suppress_callback_exceptions=True) #dbc.themes.MORPH | dbc.themes.SOLAR
-#server= app.server
+server= app.server
 app.layout = html.Div([
     html.Br(),
     html.H2("Function Approximation"),
@@ -274,10 +274,10 @@ def update(tab):
         return rbf_layout
 
 if __name__ == "__main__":
-    app.run(
-        debug=False,
-        port=random.randint(8000, 9999),  # 8080
-        host="127.0.0.1"
+    app.run_server(
+        debug=True,
+        port=8080
+        host="0.0.0.0"
     )
 
     # app.run_server(
