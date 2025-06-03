@@ -182,7 +182,7 @@ def download_instagram_video(url):
 # download_instagram_video("https://www.instagram.com/instagram/reel/DIRaymXsovm/?hl=en")
 
 app= dash.Dash(__name__,external_stylesheets=[dbc.themes.SKETCHY])
-#server= app.server
+server= app.server
 
 app.index_string='''
 <!DOCTYPE html>
@@ -332,9 +332,9 @@ def updater(tab):
     if tab == 'instagram':
         return ig_layout
 
-if __name__ == '__main__':
-    app.run(
-        debug=False,
-        host= '127.0.0.1',
-        port= random.randint(8000,9999)
+if __name__ == "__main__":
+    app.run_server(
+        debug=True,
+        port=8080,
+        host="0.0.0.0"
     )
