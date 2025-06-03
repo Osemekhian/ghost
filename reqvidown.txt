@@ -1,0 +1,15 @@
+dash
+gunicorn
+dash-bootstrap-components
+dash-renderer
+dash-html-components
+dash-core-components
+joblib
+yt_dlp
+instaloader
+urllib3
+uuid
+random2
+pybase64
+temp
+regex
