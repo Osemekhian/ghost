@@ -1,6 +1,4 @@
 dash
-scikit-learn
-statsmodels
 requests
 gunicorn
 dash-bootstrap-components
