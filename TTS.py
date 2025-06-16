@@ -1,7 +1,7 @@
 # libraries import
 import dash as dash
 from dash import dcc,dash_table, State, no_update
-import joblib, base64, random, io, os,uuid
+import base64, random, io, os,uuid
 from io import BytesIO
 from dash import html
 from dash.dependencies import Input, Output
@@ -38,7 +38,7 @@ base64_string= 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAIAAAB7Gk
 
 # The App
 app= dash.Dash(__name__,external_stylesheets=[dbc.themes.MORPH],suppress_callback_exceptions=True) #dbc.themes.MORPH | dbc.themes.SKETCHY
-# server= app.server
+server= app.server
 
 app.index_string='''
 <!DOCTYPE html>
@@ -228,8 +228,8 @@ def trigger_download(n_clicks, audio_base64, filename):
 
 #======================================================================================================
 if __name__ == "__main__":
-    app.run(
-        debug=False,
-        port=random.randint(8000, 9999),  # 8080
-        host="127.0.0.1"
+    app.run_server(
+        debug=True,
+        port=8080,
+        host="0.0.0.0"
     )
