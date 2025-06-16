@@ -1,0 +1,17 @@
+dash
+scikit-learn
+statsmodels
+requests
+gunicorn
+dash-bootstrap-components
+dash-renderer
+dash-html-components
+dash-core-components
+random2
+DateTime
+requires.io
+uuid
+pybase64
+gTTS
+pdfplumber
+temp
