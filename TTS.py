@@ -46,7 +46,7 @@ app.index_string='''
     <head>
         {%metas%}
         <title>PDF To Audio</title>
-        <link rel="icon" href="{base64_string}">
+        <link rel="icon" href="https://github.com/Osemekhian/ghost/blob/main/6326.jpg?raw=true">
         {%css%}
     </head>
     <body>
