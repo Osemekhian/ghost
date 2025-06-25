@@ -98,8 +98,8 @@ def translate_text(n, text, src_lang, tgt_lang):
 
 
 if __name__ == "__main__":
-    app.run(
-        debug=False,
-        port=random.randint(8000, 9999),  # 8080
-        host="127.0.0.1"
+    app.run_server(
+        debug=True,
+        port=8080,
+        host="0.0.0.0"
     )
