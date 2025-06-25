@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: smart-translator
+    env: python
+    buildCommand: ""
+    startCommand: gunicorn translator:server
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
