@@ -1,0 +1,8 @@
+dash
+requests
+gunicorn
+dash-bootstrap-components
+dash-renderer
+dash-html-components
+dash-core-components
+googletrans==4.0.0-rc1
