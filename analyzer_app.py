@@ -181,15 +181,17 @@ def parse_contents(contents, filename):
              
 #===========================================
 
-my_app= dash.Dash(__name__,external_stylesheets=[dbc.themes.MORPH]) #dbc.themes.MORPH | dbc.themes.SOLAR
-server = my_app.server
+my_app= dash.Dash(__name__,external_stylesheets=[dbc.themes.LUX],suppress_callback_exceptions=True) #dbc.themes.MORPH | dbc.themes.SOLAR
+server= my_app.server
+
+# my_app.title= "Data Analyzer"
 my_app.index_string='''
 <!DOCTYPE html>
 <html>
     <head>
         {%metas%}
         <title>Data Analyzer</title>
-        <link rel="icon" href="https://raw.githubusercontent.com/Bravelion2017/source/refs/heads/main/file-HFcKPxRscWybi9pdrJfJ8e.webp">
+        <link rel="icon" href="https://raw.githubusercontent.com/Osemekhian/ghost/refs/heads/main/file-HFcKPxRscWybi9pdrJfJ8e.webp" type="image/x-icon">
         {%css%}
     </head>
     <body>
@@ -202,12 +204,13 @@ my_app.index_string='''
     </body>
 </html>
 '''
-my_app.layout= html.Div([
+my_app.layout= dbc.Container([ html.Div([
     html.P(""),
     html.H1("Data Analyzer"),
     html.P("by: Osemekhian Solomon Ehilen"),html.Br(),
-    dcc.Markdown("""This Web App Collects Your ***Data(link)*** 
+    dcc.Markdown("""This Web App Collects Your ***Data(Link or Upload)*** 
                     then Generates Your Analysis & Model"""),
+    #=================
     dbc.Input(id="in1",placeholder="Paste Link to Your Data...",type='text', size="lg", className="mb-3"),
     html.Pre('For example: https://raw.githubusercontent.com/datasciencedojo/datasets/refs/heads/master/titanic.csv'),
     html.Div([dcc.Upload(id='upload-data',children=html.Div(['Drag and Drop or ',html.A('Select Data File')]),style={
@@ -223,10 +226,11 @@ my_app.layout= html.Div([
         'align-items':'center',
         'margin':'auto'
     })]),
+    #==================
     html.Br(),
     dcc.RadioItems(options=['Raw Data', 'Cleaned Data'], value='Raw Data', id='radio'),
-    html.Button("Download Cleaned Data",id='btn_csv'),html.Br(),
-    dcc.Download(id='download-data-cleaned'), html.Br(),
+    html.Button("Download Cleaned Data",id='btn_csv',n_clicks=0),html.Br(),
+    dcc.Download(id='download-data-cleaned'), html.Pre("One-time Download Per Session"),html.Br(),
     html.P('Remove outliers using one numerical column:'),
     dcc.Dropdown(id='drp', multi=False),
     dcc.Checklist(options=['Remove Outliers'], id='outlier'),
@@ -267,9 +271,12 @@ my_app.layout= html.Div([
     dbc.Input(id='in2',placeholder='type in the features seperated by comma...', type='text'),
     html.Br(),
     html.Div(id='predout'), html.Br(),
-         
-    dcc.Markdown("Bravelion | 2025 | Contact for Analysis: [Osemekhian Ehilen](mailto:oseme781227@gmail.com) ")
+
+
+    dcc.Markdown("Bravelion | 2025 | Contact for Analysis: [email](mailto:oseme781227@gmail.com) ")
 ], style=style)
+
+],fluid=True)
 
 @my_app.callback([Output('out1','children'),
                         Output('outy','children'),
@@ -277,19 +284,19 @@ my_app.layout= html.Div([
                         Output('store1', 'data'),
                         Output('unidrp','options'),
                         Output('bidrp','options'),
-                      Output('drp','options'),
-                      Output('moddrp','options'),
-                      Output('mod2drp','options')],
-                    [Input('in1','value'),
-                     Input('upload-data','contents'),
-                     State('upload-data','filename'),
-                     Input('radio','value'),
-                     Input('outlier','value'),
-                     Input('drp','value')]
+                        Output('drp','options'),
+                        Output('moddrp','options'),
+                        Output('mod2drp','options')],
+                       [Input('in1','value'),
+                        Input('upload-data','contents'),
+                        State('upload-data','filename'),
+                        Input('radio','value'),
+                        Input('outlier','value'),
+                        Input('drp','value')]
                 )
 def link(text,contents, filename, rad, button, drpval):
-    #if text==None:
-    #    return ""
+    # if text==None:
+    #     return ""
     if contents is not None:
         try:
             if button:
@@ -317,6 +324,7 @@ def link(text,contents, filename, rad, button, drpval):
                 desc.insert(0, 'stat', df.describe().index)
                 return (html.Div(dash_table.DataTable(df.to_dict('records'),
                                                       [{"name": i, "id": i} for i in df.columns],
+                                                      style_table={'overflowX': 'auto'},
                                                       style_cell={'textAlign': 'left', 'padding': '5px'},
                                                       style_header={'backgroundColor': 'rgb(220, 220, 220)',
                                                                     'fontWeight': 'bold'},
@@ -325,6 +333,7 @@ def link(text,contents, filename, rad, button, drpval):
                                                                   "maxWidth": 0})), html.H3("Data Description"),
                         html.Div(dash_table.DataTable(desc.to_dict('records'),
                                                       [{"name": i, "id": i} for i in desc.columns],
+                                                      style_table={'overflowX': 'auto'},
                                                       style_cell={'textAlign': 'left', 'padding': '5px'},
                                                       style_header={'backgroundColor': 'rgb(220, 220, 220)',
                                                                     'fontWeight': 'bold'},
@@ -339,6 +348,7 @@ def link(text,contents, filename, rad, button, drpval):
                 desc.insert(0, 'stat', df.describe().index)
                 return (html.Div(dash_table.DataTable(df.to_dict('records'),
                                                       [{"name": i, "id": i} for i in df.columns],
+                                                      style_table={'overflowX': 'auto'},
                                                       style_cell={'textAlign': 'left', 'padding': '5px'},
                                                       style_header={'backgroundColor': 'rgb(220, 220, 220)',
                                                                     'fontWeight': 'bold'},
@@ -347,6 +357,7 @@ def link(text,contents, filename, rad, button, drpval):
                                                                   "maxWidth": 0})), html.H3("Data Description"),
                         html.Div(dash_table.DataTable(desc.to_dict('records'),
                                                       [{"name": i, "id": i} for i in desc.columns],
+                                                      style_table={'overflowX': 'auto'},
                                                       style_cell={'textAlign': 'left', 'padding': '5px'},
                                                       style_header={'backgroundColor': 'rgb(220, 220, 220)',
                                                                     'fontWeight': 'bold'},
@@ -355,7 +366,7 @@ def link(text,contents, filename, rad, button, drpval):
                                                                   "maxWidth": 0})),
                         df.to_json(orient='table'), options, options, options, options, options)
         except:
-            return ""
+            return '','','','','','','','',''
     else:
     #======
         try:
@@ -384,6 +395,7 @@ def link(text,contents, filename, rad, button, drpval):
                 desc.insert(0, 'stat', df.describe().index)
                 return (html.Div(dash_table.DataTable(df.to_dict('records'),
                                                       [{"name": i, "id": i} for i in df.columns],
+                                                      style_table={'overflowX': 'auto'},
                                                       style_cell={'textAlign': 'left', 'padding': '5px'},
                                                       style_header={'backgroundColor': 'rgb(220, 220, 220)',
                                                                     'fontWeight': 'bold'},
@@ -392,6 +404,7 @@ def link(text,contents, filename, rad, button, drpval):
                                                                   "maxWidth": 0})), html.H3("Data Description"),
                         html.Div(dash_table.DataTable(desc.to_dict('records'),
                                                       [{"name": i, "id": i} for i in desc.columns],
+                                                      style_table={'overflowX': 'auto'},
                                                       style_cell={'textAlign': 'left', 'padding': '5px'},
                                                       style_header={'backgroundColor': 'rgb(220, 220, 220)',
                                                                     'fontWeight': 'bold'},
@@ -406,18 +419,20 @@ def link(text,contents, filename, rad, button, drpval):
                 desc.insert(0, 'stat', df.describe().index)
                 return (html.Div(dash_table.DataTable(df.to_dict('records'),
                                               [{"name": i, "id": i} for i in df.columns],
+                                              style_table={'overflowX': 'auto'},
                                               style_cell={'textAlign': 'left','padding':'5px'},
                                               style_header={'backgroundColor':  'rgb(220, 220, 220)','fontWeight': 'bold'},
                                                      page_size=10, style_data={"overflow":"hidden","textOverflow":"ellipsis",
                                                                                "maxWidth":0})),html.H3("Data Description"),html.Div(dash_table.DataTable(desc.to_dict('records'),
                                               [{"name": i, "id": i} for i in desc.columns],
+                                              style_table={'overflowX': 'auto'},
                                               style_cell={'textAlign': 'left','padding':'5px'},
                                               style_header={'backgroundColor':  'rgb(220, 220, 220)','fontWeight': 'bold'},
                                                      page_size=20, style_data={"overflow":"hidden","textOverflow":"ellipsis",
                                                                                "maxWidth":0})),
                         df.to_json(orient='table'), options,options, options, options,options)
         except:
-            return ""
+            return '','','','','','','','',''
 
 @my_app.callback(Output('uni','children'),
                  [Input('store1','data'),
@@ -449,29 +464,34 @@ def charts(data, columns, rad, button):
         if button:
             # pass
             if rad:
-                columns= columns[:2]
+                columns = columns[:2]
                 df = pd.read_json(data, orient='table')
-                cor= df.corr(numeric_only=True).round(2)
-                fig2 = px.box(df, x=columns[0], y=columns[-1], title=f"Box Plot for {columns[0]} & {columns[-1]}") #points='all',
-                fig3 = px.scatter(df, x=columns[0], y=columns[-1], title=f"Scatter Plot for {columns[0]} & {columns[-1]}")
-                fig4= px.imshow(cor, text_auto=True, title=f"Heatmap Correlation Plot",aspect="auto")
+                cor = df.corr(numeric_only=True).round(2)
+                fig2 = px.box(df, x=columns[0], y=columns[-1],
+                              title=f"Box Plot for {columns[0]} & {columns[-1]}")  # points='all',
+                fig3 = px.scatter(df, x=columns[0], y=columns[-1],
+                                  title=f"Scatter Plot for {columns[0]} & {columns[-1]}")
+                fig4 = px.imshow(cor, text_auto=True, title=f"Heatmap Correlation Plot", aspect="auto")
                 fig4.update_xaxes(side="top")
-                fig5 = px.pie(df, values=columns[0], names=columns[-1], hole=0.1, title=f"Pie Plot for {columns[0]} & {columns[-1]}")
+                fig5 = px.pie(df, values=columns[0], names=columns[-1], hole=0.1,
+                              title=f"Pie Plot for {columns[0]} & {columns[-1]}")
                 fig = px.bar(df, x=columns[0], y=columns[-1], title=f"Bar Plot for {columns[0]} & {columns[-1]}")
 
-                return html.Div([dcc.Graph(figure=fig2),dcc.Graph(figure=fig3),dcc.Graph(figure=fig4),dcc.Graph(figure=fig),dcc.Graph(figure=fig5)])
+                return html.Div(
+                    [dcc.Graph(figure=fig2), dcc.Graph(figure=fig3), dcc.Graph(figure=fig4), dcc.Graph(figure=fig),
+                     dcc.Graph(figure=fig5)])
     except:
         return ""
 #======================================================================================
 @my_app.callback(Output('modelout','children'),
-                 Output('store2', 'data'),
-                 Output('store3lt', 'data'),
-                 Output('store4sc', 'data'),
-                 [Input('store1','data'),
-                  Input('modeldrp','value'),
-                  Input('moddrp', 'value'),
-                  Input('mod2drp','value'),
-                  Input('btn_analyze', 'n_clicks')])
+                       Output('store2', 'data'),
+                       Output('store3lt', 'data'),
+                       Output('store4sc', 'data'),
+                     [Input('store1','data'),
+                      Input('modeldrp','value'),
+                      Input('moddrp', 'value'),
+                      Input('mod2drp','value'),
+                      Input('btn_analyze', 'n_clicks')])
 def out1( data, model_type, target, features, btn_analyze):
     try:
         if btn_analyze:
@@ -494,11 +514,11 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=30,  # Number of parameter settings to sample
+                        n_iter=20,  # Number of parameter settings to sample
                         scoring='accuracy',  # Metric to evaluate
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
-                        n_jobs=-1,  # Use all available CPU cores
+                        n_jobs=1,  # Use all available CPU cores
                     )
                 elif model_type =='RandomForestClassifier':
                     model= RandomForestClassifier(random_state=random_state)
@@ -518,13 +538,12 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=2,  # Number of parameter settings to sample
+                        n_iter=20,  # Number of parameter settings to sample
                         scoring='accuracy',  # Metric to evaluate
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
-                        n_jobs=-1,  # Use all available CPU cores
+                        n_jobs=1,  # Use all available CPU cores
                     )
-
                 elif model_type == 'AdaBoostClassifier':
                     model = AdaBoostClassifier(random_state=42)
                     param_dist = {
@@ -537,13 +556,12 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=5,  # Number of parameter settings to sample
+                        n_iter=15,  # Number of parameter settings to sample
                         scoring='accuracy',  # Metric to evaluate
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
-                        n_jobs=-1,
+                        n_jobs=1,
                     )
-                     
                 elif model_type == 'GradientBoostingClassifier':
                     model= GradientBoostingClassifier(random_state=random_state)
                     param_dist = {
@@ -563,7 +581,7 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=2,  # Number of parameter settings to sample
+                        n_iter=15,  # Number of parameter settings to sample
                         scoring='accuracy',  # Metric to evaluate
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
@@ -586,11 +604,11 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=2,  # Number of parameter settings to sample
+                        n_iter=15,  # Number of parameter settings to sample
                         scoring='accuracy',  # Metric to evaluate
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
-                        n_jobs=-1,  # Use all available CPU cores
+                        n_jobs=1,  # Use all available CPU cores
                     )
                 elif model_type =='Naive Bayes Classifier':
                     model= GaussianNB()
@@ -601,11 +619,11 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=30,  # Number of parameter settings to sample
+                        n_iter=20,  # Number of parameter settings to sample
                         scoring='accuracy',  # Metric to evaluate
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
-                        n_jobs=-1,  # Use all available CPU cores
+                        n_jobs=1,  # Use all available CPU cores
                     )
                 elif model_type == 'KNeighborsClassifier':
                     model= KNeighborsClassifier()
@@ -623,7 +641,7 @@ def out1( data, model_type, target, features, btn_analyze):
                         scoring='accuracy',  # Metric to evaluate (negative MSE for regression)
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
-                        n_jobs=-1,  # Use all available CPU cores
+                        n_jobs=1,  # Use all available CPU cores
                     )
             else:
                 if model_type == 'LinearRegression':
@@ -642,11 +660,11 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=2,  # Number of parameter settings to sample
+                        n_iter=20,  # Number of parameter settings to sample
                         scoring='neg_mean_squared_error',  # Metric to evaluate (negative MSE for regression)
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
-                        n_jobs=-1,  # Use all available CPU cores
+                        n_jobs=1,  # Use all available CPU cores
                     )
                 elif model_type == 'AdaBoostRegressor':
                     model = AdaBoostRegressor(random_state=42)
@@ -662,11 +680,11 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=5,  # Number of parameter settings to sample
+                        n_iter=15,  # Number of parameter settings to sample
                         scoring='neg_mean_squared_error',  # Metric to evaluate (negative MSE for regression)
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
-                        n_jobs=-1,  # Use all available CPU cores
+                        n_jobs=1,  # Use all available CPU cores
                     )
                 elif model_type == 'GradientBoostingRegressor':
                     model= GradientBoostingRegressor(random_state=random_state)
@@ -684,7 +702,7 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=2,  # Number of parameter settings to sample
+                        n_iter=15,  # Number of parameter settings to sample
                         scoring='neg_mean_squared_error',  # Metric to evaluate (negative MSE for regression)
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
@@ -705,11 +723,11 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=2,  # Number of parameter settings to sample
+                        n_iter=15,  # Number of parameter settings to sample
                         scoring='neg_mean_squared_error',  # Metric to evaluate (negative MSE for regression)
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
-                        n_jobs=-1,  # Use all available CPU cores
+                        n_jobs=1,  # Use all available CPU cores
                     )
                 elif model_type == 'KNeighborsRegressor':
                     model= KNeighborsRegressor()
@@ -727,7 +745,7 @@ def out1( data, model_type, target, features, btn_analyze):
                         scoring='neg_mean_squared_error',  # Metric to evaluate (negative MSE for regression)
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
-                        n_jobs=-1,  # Use all available CPU cores
+                        n_jobs=1,  # Use all available CPU cores
                     )
                 elif model_type == 'Ridge Regression':
                     model= Ridge()
@@ -740,11 +758,11 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=30,  # Number of parameter settings to sample
+                        n_iter=20,  # Number of parameter settings to sample
                         scoring='neg_mean_squared_error',  # Metric to evaluate (negative MSE for regression)
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
-                        n_jobs=-1,  # Use all available CPU cores
+                        n_jobs=1,  # Use all available CPU cores
                     )
                 elif model_type == 'Lasso Regression':
                     model= Lasso()
@@ -757,11 +775,11 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=30,  # Number of parameter settings to sample
+                        n_iter=20,  # Number of parameter settings to sample
                         scoring='neg_mean_squared_error',  # Metric to evaluate (negative MSE for regression)
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
-                        n_jobs=-1,  # Use all available CPU cores
+                        n_jobs=1,  # Use all available CPU cores
                     )
                 elif model_type == 'ElasticNet Regression':
                     model= ElasticNet()
@@ -775,11 +793,11 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=30,  # Number of parameter settings to sample
+                        n_iter=20,  # Number of parameter settings to sample
                         scoring='neg_mean_squared_error',  # Metric to evaluate (negative MSE for regression)
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
-                        n_jobs=-1,  # Use all available CPU cores
+                        n_jobs=1,  # Use all available CPU cores
                     )
 
 
@@ -816,7 +834,7 @@ def out1( data, model_type, target, features, btn_analyze):
                                  dcc.Graph(figure=fig), html.Pre(f"Best Parameters for {model_type}\n {random_search.best_params_}")],style=style2),model_base64, lt_base64, sc_base64
             else:
                 random_search.fit(x_train, y_train)
-                #=====
+                # =====
                 buffer = BytesIO()
                 joblib.dump(random_search, buffer)  # Write to in-memory buffer
                 buffer.seek(0)  # Reset buffer position to read later
@@ -834,7 +852,7 @@ def out1( data, model_type, target, features, btn_analyze):
                 buffer3.seek(0)  # Reset buffer position to read later
                 sc_bytes = buffer3.getvalue()  # Get raw bytes
                 sc_base64 = base64.b64encode(sc_bytes).decode("utf-8")
-                #=====
+                # =====
                 if model_type == 'LinearRegression':
                     y_pred = random_search.predict(x_test)
                     mse = round(mean_squared_error(y_test, y_pred), 4)
@@ -852,7 +870,7 @@ def out1( data, model_type, target, features, btn_analyze):
                         [html.P(f"The metrics below are based on the test set of your data for {model_type}:"),
                          html.P(f"Mean Squared Error:{mse}"), html.P(f"Root Mean Squared Error:{rmse}"),
                          html.P(f"Mean Absolute Error:{mae}"), html.P(f"R-Squared:{r2}"),
-                         html.P(f"Adjusted R-Squared:{adj_r2}"), dcc.Graph(figure=fig)],style=style2),model_base64, lt_base64, sc_base64
+                         html.P(f"Adjusted R-Squared:{adj_r2}"), dcc.Graph(figure=fig)],style=style2), model_base64, lt_base64, sc_base64
                 else:
                     y_pred = random_search.best_estimator_.predict(x_test)
                     mse= round(mean_squared_error(y_test,y_pred),4)
@@ -871,7 +889,7 @@ def out1( data, model_type, target, features, btn_analyze):
                                      html.P(f"Mean Absolute Error:{mae}"),html.P(f"R-Squared:{r2}"),
                                      html.P(f"Adjusted R-Squared:{adj_r2}"),
                                      html.Pre(f"Best Parameters for {model_type}\n {random_search.best_params_}"),
-                                     dcc.Graph(figure=fig)],style=style2),model_base64, lt_base64, sc_base64
+                                     dcc.Graph(figure=fig)],style=style2), model_base64, lt_base64, sc_base64
 
     except:
         return "","","",""
@@ -882,10 +900,11 @@ def out1( data, model_type, target, features, btn_analyze):
                   Input('store1','data'),
                   Input('btn_csv','n_clicks')], prevent_initial_call=True)
 def out(value, data, n_clicks):
+    if n_clicks>1:
+        return ""
     if value == 'Cleaned Data' and n_clicks:
         df = pd.read_json(data, orient='table')
         return dcc.send_data_frame(df.to_csv, 'cleaned_data.csv')
-
 
 @my_app.callback(Output('predout','children'),
                  [Input('store2','data'),
@@ -930,7 +949,6 @@ def dope(model_base64,lt,sc,row_data, n_clicks):
                 return html.Div([html.Pre(f"Prediction: {pred}")])
     except:
         return html.Pre(f"...No Prediction Yet...")
-
 
 if __name__ == '__main__':
     my_app.run_server(
