@@ -221,7 +221,7 @@ my_app.layout= dbc.Container([ html.Div([
         'borderStyle': 'dashed',
         'borderRadius': '5px',
         'textAlign': 'center',
-        'background-color':'#485785',
+        'background-color':'#000000',
         'color':'white',
         'align-items':'center',
         'margin':'auto'
@@ -234,7 +234,7 @@ my_app.layout= dbc.Container([ html.Div([
     html.P('Remove outliers using one numerical column:'),
     dcc.Dropdown(id='drp', multi=False),
     dcc.Checklist(options=['Remove Outliers'], id='outlier'),
-    html.Div(id="out1"),
+    dcc.Loading(id='loading11',children=html.Div(id="out1", className="mt-3 text-center")),
     html.Br(),html.Div(id='outy'),
     html.Div(id='out2'),
     dcc.Store(id='store1'),html.Br(),
@@ -242,13 +242,13 @@ my_app.layout= dbc.Container([ html.Div([
     html.H4("Univariate Charts"), html.Br(),
     html.P("Select Column:"),
     dcc.Dropdown(id='unidrp',multi=False),
-    html.Div(id='uni'), html.Br(),
+    dcc.Loading(id='loading', children=html.Div(id='uni',className="mt-3 text-center")), html.Br(),
 
     html.H4("Bivariate Charts"), html.Br(),
     html.P('NB:Tweak the column selections to get some charts as desired'),
     html.P("Select Columns (2 max):"),
     dcc.Dropdown(id='bidrp',multi=True),
-    html.Div(id='Bi'),
+    dcc.Loading(id='loading2', children=html.Div(id='Bi',className="mt-3 text-center")),
 
     html.Div(id='out3'), html.Br(),
 
@@ -262,7 +262,7 @@ my_app.layout= dbc.Container([ html.Div([
     dcc.Dropdown(id='modeldrp',options= [{'label':i,'value':i} for i in models]),
     html.Button("Analyze",id='btn_analyze'), html.Br(),html.Br(),
 
-    html.Div(id='modelout'),
+    dcc.Loading(id='loading3', children=html.Div(id='modelout',className="mt-3 text-center")),
     dcc.Store(id='store2'),dcc.Store(id='store3lt'),dcc.Store(id='store4sc'),
     html.Br(),
 
@@ -270,7 +270,7 @@ my_app.layout= dbc.Container([ html.Div([
     html.Pre('Insert the appropriate features for prediction'),
     dbc.Input(id='in2',placeholder='type in the features seperated by comma...', type='text'),
     html.Br(),
-    html.Div(id='predout'), html.Br(),
+    dcc.Loading(id='loading4', children=html.Div(id='predout',className="mt-3 text-center")), html.Br(),
 
 
     dcc.Markdown("Bravelion | 2025 | Contact for Analysis: [email](mailto:oseme781227@gmail.com) ")
@@ -472,7 +472,7 @@ def charts(data, columns, rad, button):
                 fig3 = px.scatter(df, x=columns[0], y=columns[-1],
                                   title=f"Scatter Plot for {columns[0]} & {columns[-1]}")
                 fig4 = px.imshow(cor, text_auto=True, title=f"Heatmap Correlation Plot", aspect="auto")
-                fig4.update_xaxes(side="top")
+                fig4.update_xaxes(side="bottom")
                 fig5 = px.pie(df, values=columns[0], names=columns[-1], hole=0.1,
                               title=f"Pie Plot for {columns[0]} & {columns[-1]}")
                 fig = px.bar(df, x=columns[0], y=columns[-1], title=f"Bar Plot for {columns[0]} & {columns[-1]}")
