@@ -25,6 +25,8 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.metrics import accuracy_score, mean_squared_error, confusion_matrix, mean_absolute_error, classification_report, r2_score
 from scipy.stats import uniform, randint, uniform, loguniform
+import plotly.io as pio
+pio.templates.default = "gridon" #"plotly"
 style={'textAlign':'center'}
 style2={'width': '80%',
         'borderWidth': '1px',
@@ -35,6 +37,14 @@ style2={'width': '80%',
         'color':'white',
         'align-items':'center',
         'margin':'auto'
+    }
+box_style = {
+        'border': '1px solid #ccc',
+        'borderRadius': '8px',
+        'padding': '10px',
+        'marginBottom': '10px',
+        #'boxShadow': '0 2px 8px rgba(0,0,0,0.1)',
+        'background': 'linear-gradient(to bottom,#e5e5e5, #c0c0c0, #a0a0a0)'  # Light purple background
     }
 steps=0.1
 random_state= 42
@@ -193,6 +203,26 @@ my_app.index_string='''
         <title>Data Analyzer</title>
         <link rel="icon" href="https://raw.githubusercontent.com/Osemekhian/ghost/refs/heads/main/file-HFcKPxRscWybi9pdrJfJ8e.webp" type="image/x-icon">
         {%css%}
+        <style>
+            .hover-tile {
+                transition: all 0.3s ease;
+                border: 2px solid #999;
+                border-radius: 12px;
+                padding: 15px;
+                background: linear-gradient(to bottom, #e5e5e5, #c0c0c0, #a0a0a0);  /* light to silver */
+                color: #000;  /* Black text for contrast */
+                margin-bottom: 10px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+
+            .hover-tile:hover {
+                border-color: #666;
+                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+                transform: scale(1.02);
+                background: linear-gradient(to bottom, #d8d8d8, #b0b0b0, #888888); /* darker on hover */
+                cursor: pointer;
+            }
+        </style>
     </head>
     <body>
         {%app_entry%}
@@ -330,7 +360,7 @@ def link(text,contents, filename, rad, button, drpval):
                                                                     'fontWeight': 'bold'},
                                                       page_size=10,
                                                       style_data={"overflow": "hidden", "textOverflow": "ellipsis",
-                                                                  "maxWidth": 0})), html.H3("Data Description"),
+                                                                  "maxWidth": 0}),className="hover-tile"), html.H3("Data Description"),
                         html.Div(dash_table.DataTable(desc.to_dict('records'),
                                                       [{"name": i, "id": i} for i in desc.columns],
                                                       style_table={'overflowX': 'auto'},
@@ -339,7 +369,7 @@ def link(text,contents, filename, rad, button, drpval):
                                                                     'fontWeight': 'bold'},
                                                       page_size=20,
                                                       style_data={"overflow": "hidden", "textOverflow": "ellipsis",
-                                                                  "maxWidth": 0})),
+                                                                  "maxWidth": 0}),className="hover-tile"),
                         df.to_json(orient='table'), options, options, options, options, options)
             else:
                 df = cleaner(data)
@@ -354,7 +384,7 @@ def link(text,contents, filename, rad, button, drpval):
                                                                     'fontWeight': 'bold'},
                                                       page_size=10,
                                                       style_data={"overflow": "hidden", "textOverflow": "ellipsis",
-                                                                  "maxWidth": 0})), html.H3("Data Description"),
+                                                                  "maxWidth": 0}),className="hover-tile"), html.H3("Data Description"),
                         html.Div(dash_table.DataTable(desc.to_dict('records'),
                                                       [{"name": i, "id": i} for i in desc.columns],
                                                       style_table={'overflowX': 'auto'},
@@ -363,7 +393,7 @@ def link(text,contents, filename, rad, button, drpval):
                                                                     'fontWeight': 'bold'},
                                                       page_size=20,
                                                       style_data={"overflow": "hidden", "textOverflow": "ellipsis",
-                                                                  "maxWidth": 0})),
+                                                                  "maxWidth": 0}),className="hover-tile"),
                         df.to_json(orient='table'), options, options, options, options, options)
         except:
             return '','','','','','','','',''
@@ -401,7 +431,7 @@ def link(text,contents, filename, rad, button, drpval):
                                                                     'fontWeight': 'bold'},
                                                       page_size=10,
                                                       style_data={"overflow": "hidden", "textOverflow": "ellipsis",
-                                                                  "maxWidth": 0})), html.H3("Data Description"),
+                                                                  "maxWidth": 0}),className="hover-tile"), html.H3("Data Description"),
                         html.Div(dash_table.DataTable(desc.to_dict('records'),
                                                       [{"name": i, "id": i} for i in desc.columns],
                                                       style_table={'overflowX': 'auto'},
@@ -410,7 +440,7 @@ def link(text,contents, filename, rad, button, drpval):
                                                                     'fontWeight': 'bold'},
                                                       page_size=20,
                                                       style_data={"overflow": "hidden", "textOverflow": "ellipsis",
-                                                                  "maxWidth": 0})),
+                                                                  "maxWidth": 0}),className="hover-tile"),
                         df.to_json(orient='table'), options, options, options,options,options)
             else:
                 df= cleaner(data)
@@ -423,13 +453,13 @@ def link(text,contents, filename, rad, button, drpval):
                                               style_cell={'textAlign': 'left','padding':'5px'},
                                               style_header={'backgroundColor':  'rgb(220, 220, 220)','fontWeight': 'bold'},
                                                      page_size=10, style_data={"overflow":"hidden","textOverflow":"ellipsis",
-                                                                               "maxWidth":0})),html.H3("Data Description"),html.Div(dash_table.DataTable(desc.to_dict('records'),
+                                                                               "maxWidth":0}),className="hover-tile"),html.H3("Data Description"),html.Div(dash_table.DataTable(desc.to_dict('records'),
                                               [{"name": i, "id": i} for i in desc.columns],
                                               style_table={'overflowX': 'auto'},
                                               style_cell={'textAlign': 'left','padding':'5px'},
                                               style_header={'backgroundColor':  'rgb(220, 220, 220)','fontWeight': 'bold'},
                                                      page_size=20, style_data={"overflow":"hidden","textOverflow":"ellipsis",
-                                                                               "maxWidth":0})),
+                                                                               "maxWidth":0}),className="hover-tile"),
                         df.to_json(orient='table'), options,options, options, options,options)
         except:
             return '','','','','','','','',''
@@ -449,7 +479,15 @@ def chart(data, column, rad, button):
             fig2 = px.box(df, y=column, title=f" Box Plot for {column}")
             fig3 = px.line(df, y=column, title=f" Line Plot for {column}")
 
-            return html.Div([dcc.Graph(figure=fig),dcc.Graph(figure=fig2),dcc.Graph(figure=fig3)])
+            return dbc.Container([
+                                    dbc.Row([
+                                    dbc.Col(html.Div(dcc.Graph(figure=fig), className="hover-tile", style=box_style),xs=12, sm=12, md=6, lg=6),
+                                    dbc.Col(html.Div(dcc.Graph(figure=fig2), className="hover-tile", style=box_style), xs=12, sm=12, md=6, lg=6),
+                                    ], className="mb-4"),  # margin-bottom for spacing
+                                    dbc.Row([
+                                    dbc.Col(html.Div(dcc.Graph(figure=fig3), className="hover-tile", style=box_style), width=12)
+                                ])
+                            ])
     except:
         return ""
 
@@ -477,9 +515,21 @@ def charts(data, columns, rad, button):
                               title=f"Pie Plot for {columns[0]} & {columns[-1]}")
                 fig = px.bar(df, x=columns[0], y=columns[-1], title=f"Bar Plot for {columns[0]} & {columns[-1]}")
 
-                return html.Div(
-                    [dcc.Graph(figure=fig2), dcc.Graph(figure=fig3), dcc.Graph(figure=fig4), dcc.Graph(figure=fig),
-                     dcc.Graph(figure=fig5)])
+                return dbc.Container([
+                                    dbc.Row([
+                                    dbc.Col(html.Div(dcc.Graph(figure=fig2), className="hover-tile", style=box_style),xs=12, sm=12, md=6, lg=6),
+                                    dbc.Col(html.Div(dcc.Graph(figure=fig3), className="hover-tile", style=box_style), xs=12, sm=12, md=6, lg=6),
+                                    ], className="mb-2"),
+
+				    dbc.Row([
+                                    dbc.Col(html.Div(dcc.Graph(figure=fig4), className="hover-tile", style=box_style),xs=12, sm=12, md=6, lg=6),
+                                    dbc.Col(html.Div(dcc.Graph(figure=fig), className="hover-tile", style=box_style), xs=12, sm=12, md=6, lg=6),
+                                    ], className="mb-2"),
+
+				    dbc.Row([
+                                    dbc.Col(html.Div(dcc.Graph(figure=fig5), className="hover-tile", style=box_style), width=12)
+                                ])
+                            ])
     except:
         return ""
 #======================================================================================
@@ -538,7 +588,7 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=3,  # Number of parameter settings to sample
+                        n_iter=20,  # Number of parameter settings to sample
                         scoring='accuracy',  # Metric to evaluate
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
@@ -556,7 +606,7 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=3,  # Number of parameter settings to sample
+                        n_iter=15,  # Number of parameter settings to sample
                         scoring='accuracy',  # Metric to evaluate
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
@@ -581,7 +631,7 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=3,  # Number of parameter settings to sample
+                        n_iter=15,  # Number of parameter settings to sample
                         scoring='accuracy',  # Metric to evaluate
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
@@ -604,7 +654,7 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=3,  # Number of parameter settings to sample
+                        n_iter=15,  # Number of parameter settings to sample
                         scoring='accuracy',  # Metric to evaluate
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
@@ -619,7 +669,7 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=3,  # Number of parameter settings to sample
+                        n_iter=20,  # Number of parameter settings to sample
                         scoring='accuracy',  # Metric to evaluate
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
@@ -637,7 +687,7 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=3,  # Number of parameter settings to sample
+                        n_iter=20,  # Number of parameter settings to sample
                         scoring='accuracy',  # Metric to evaluate (negative MSE for regression)
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
@@ -660,7 +710,7 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=3,  # Number of parameter settings to sample
+                        n_iter=20,  # Number of parameter settings to sample
                         scoring='neg_mean_squared_error',  # Metric to evaluate (negative MSE for regression)
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
@@ -680,7 +730,7 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=3,  # Number of parameter settings to sample
+                        n_iter=15,  # Number of parameter settings to sample
                         scoring='neg_mean_squared_error',  # Metric to evaluate (negative MSE for regression)
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
@@ -702,7 +752,7 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=3,  # Number of parameter settings to sample
+                        n_iter=15,  # Number of parameter settings to sample
                         scoring='neg_mean_squared_error',  # Metric to evaluate (negative MSE for regression)
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
@@ -723,7 +773,7 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=3,  # Number of parameter settings to sample
+                        n_iter=15,  # Number of parameter settings to sample
                         scoring='neg_mean_squared_error',  # Metric to evaluate (negative MSE for regression)
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
@@ -741,7 +791,7 @@ def out1( data, model_type, target, features, btn_analyze):
                     random_search = RandomizedSearchCV(
                         estimator=model,
                         param_distributions=param_dist,
-                        n_iter=3,  # Number of parameter settings to sample
+                        n_iter=20,  # Number of parameter settings to sample
                         scoring='neg_mean_squared_error',  # Metric to evaluate (negative MSE for regression)
                         cv=5,  # Number of cross-validation folds
                         random_state=42,
@@ -831,7 +881,7 @@ def out1( data, model_type, target, features, btn_analyze):
                 return html.Div([html.P(f"The metrics below are based on the test set of your data for {model_type}:"),
                                  html.P(f"Accuracy Score:{score}"), html.Pre(report),
                                  html.P('Confusion Matrix'),html.Pre(cm_df.to_string()),
-                                 dcc.Graph(figure=fig), html.Pre(f"Best Parameters for {model_type}\n {random_search.best_params_}")],style=style2),model_base64, lt_base64, sc_base64
+                                 dcc.Graph(figure=fig), html.Pre(f"Best Parameters for {model_type}\n {random_search.best_params_}")],style=style2,className="hover-tile"),model_base64, lt_base64, sc_base64
             else:
                 random_search.fit(x_train, y_train)
                 # =====
@@ -870,7 +920,7 @@ def out1( data, model_type, target, features, btn_analyze):
                         [html.P(f"The metrics below are based on the test set of your data for {model_type}:"),
                          html.P(f"Mean Squared Error:{mse}"), html.P(f"Root Mean Squared Error:{rmse}"),
                          html.P(f"Mean Absolute Error:{mae}"), html.P(f"R-Squared:{r2}"),
-                         html.P(f"Adjusted R-Squared:{adj_r2}"), dcc.Graph(figure=fig)],style=style2), model_base64, lt_base64, sc_base64
+                         html.P(f"Adjusted R-Squared:{adj_r2}"), dcc.Graph(figure=fig)],style=style2,className="hover-tile"), model_base64, lt_base64, sc_base64
                 else:
                     y_pred = random_search.best_estimator_.predict(x_test)
                     mse= round(mean_squared_error(y_test,y_pred),4)
@@ -889,7 +939,7 @@ def out1( data, model_type, target, features, btn_analyze):
                                      html.P(f"Mean Absolute Error:{mae}"),html.P(f"R-Squared:{r2}"),
                                      html.P(f"Adjusted R-Squared:{adj_r2}"),
                                      html.Pre(f"Best Parameters for {model_type}\n {random_search.best_params_}"),
-                                     dcc.Graph(figure=fig)],style=style2), model_base64, lt_base64, sc_base64
+                                     dcc.Graph(figure=fig)],style=style2,className="hover-tile"), model_base64, lt_base64, sc_base64
 
     except:
         return "","","",""
